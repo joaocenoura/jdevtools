@@ -1,0 +1,12 @@
+---
+# This playbook contains common plays that will be run on all nodes.
+- name: default apps
+  apt: pkg={{item}} state=installed
+  with_items:
+    - ntp
+  tags:
+    - packages
+
+- name: start the ntp service
+  service: name=ntp state=started enabled=true
+  tags: ntp
