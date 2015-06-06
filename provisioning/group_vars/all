@@ -1,0 +1,4 @@
+---
+# backup directories
+backup_dir_common: /vagrant/backup/common
+backup_dir_gitlab: /vagrant/backup/gitlab

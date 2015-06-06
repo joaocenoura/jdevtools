@@ -1,12 +1,34 @@
 ---
-# This playbook contains common plays that will be run on all nodes.
-- name: default apps
-  apt: pkg={{item}} state=installed
+# configure apt-cacher-ng (as a client) if aptcacher.yml is provided
+# check: http://stackoverflow.com/questions/30674958/ansible-include-vars-continue-if-file-not-found
+- include_vars: "{{ item }}"
+  with_first_found:
+   - aptcacher.yml
+   - empty_fallback.yml
+
+- name: use apt-cache
+  template: src=01_proxy.j2 dest=/etc/apt/apt.conf.d/01_proxy owner=root group=root mode=644
+  sudo: true
+  when: aptcacher_host is defined
+
+# setup backup folder
+- name: create backup folder
+  shell: "mkdir -p {{ backup_dir_common }}"
+
+# install base applications
+- name: install base applications
+  apt: "pkg={{item}} state=installed update_cache=yes"
   with_items:
     - ntp
+    - apt-transport-https
+    - curl
+    - openssh-server
+    - ca-certificates
   tags:
     - packages
 
+# start necessary services
 - name: start the ntp service
   service: name=ntp state=started enabled=true
   tags: ntp
+

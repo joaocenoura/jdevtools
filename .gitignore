@@ -1,2 +1,7 @@
-# vagrant
+# volatile folders intended for local usage
 /.vagrant
+/backup
+/tmp
+
+# apt-cache-ng configurations (user may specify one if needed)
+/provisioning/roles/common/vars/aptcacher.yml

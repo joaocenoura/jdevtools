@@ -1,0 +1,5 @@
+---
+- name: gitlab reconfigure
+  shell: gitlab-ctl reconfigure
+#  command: gitlab-ctl reconfigure
+#  failed_when: false

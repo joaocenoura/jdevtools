@@ -4,8 +4,9 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "chef/debian-7.8"
 
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  # port forwarding gitlab
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "private_network", ip: "192.168.33.100"
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"

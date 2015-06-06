@@ -1,0 +1,32 @@
+---
+# add specified repository into sources list
+- name: add apt-repository for gitlab (deb)
+  apt_repository: repo='deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ wheezy main' state=present
+
+- name: add apt-repository for gitlab (deb-src)
+  apt_repository: repo='deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ wheezy main' state=present
+
+- name: add apt-key for gitlab
+  apt_key: url=https://packages.gitlab.com/gpg.key state=present
+
+# install gitlab
+- name: install gitlab
+  apt: "pkg={{ item }} state=installed update_cache=yes"
+  with_items:
+    - curl
+    - openssh-server
+    - ca-certificates
+    - postfix
+#    - gitlab-ce
+
+- name: install gitlab (dpkg)
+  shell: "dpkg -i /vagrant/tmp/gitlab-ce_7.11.4~omnibus-1_amd64.deb"
+
+# setup backup folder
+- name: create backup folder
+  shell: "mkdir -p {{ backup_dir_gitlab }}"
+
+# configure gitlab
+- name: gitlab reconfigure
+  template: src=gitlab.rb.j2 dest=/etc/gitlab owner=root group=root mode=600
+  notify: gitlab reconfigure
