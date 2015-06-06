@@ -2,12 +2,15 @@
 # add specified repository into sources list
 - name: add apt-repository for gitlab (deb)
   apt_repository: repo='deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ wheezy main' state=present
+  tags: install
 
 - name: add apt-repository for gitlab (deb-src)
   apt_repository: repo='deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ wheezy main' state=present
+  tags: install
 
 - name: add apt-key for gitlab
   apt_key: url=https://packages.gitlab.com/gpg.key state=present
+  tags: install
 
 # install gitlab
 - name: install gitlab
@@ -17,16 +20,31 @@
     - openssh-server
     - ca-certificates
     - postfix
-#    - gitlab-ce
+    - gitlab-ce
+  tags: install
 
-- name: install gitlab (dpkg)
-  shell: "dpkg -i /vagrant/tmp/gitlab-ce_7.11.4~omnibus-1_amd64.deb"
+#- name: install gitlab (dpkg)
+#  shell: "dpkg -i /vagrant/tmp/gitlab-ce_7.11.4~omnibus-1_amd64.deb"
+#  tags: install
 
 # setup backup folder
 - name: create backup folder
-  shell: "mkdir -p {{ backup_dir_gitlab }}"
+  file: "path={{ backup_dir_gitlab }} state=directory mode=0777"
+  tags: install
 
 # configure gitlab
 - name: gitlab reconfigure
-  template: src=gitlab.rb.j2 dest=/etc/gitlab owner=root group=root mode=600
+  template: src=gitlab.rb.j2 dest=/etc/gitlab/gitlab.rb owner=root group=root mode=600
   notify: gitlab reconfigure
+  tags: install
+
+################################################################################
+# backup
+################################################################################
+- name: copy backup script
+  template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_gitlab.sh owner=root group=root mode=0755"
+  tags: backup
+
+- name: perform backup
+  shell: "sh -c '{{ scripts_dir }}/backup_gitlab.sh'"
+  tags: backup

@@ -1,0 +1,2 @@
+---
+gitlab_backup_dir: /var/opt/gitlab/backups

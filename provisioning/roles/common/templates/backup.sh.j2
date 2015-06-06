@@ -1,0 +1,5 @@
+#!/bin/bash
+FPREFIX={{ backup_file_prefix }}
+
+# backup /etc/ssh
+tar -cf {{ backup_dir_common }}/${FPREFIX}_etc-ssh.tar -C / /etc/ssh

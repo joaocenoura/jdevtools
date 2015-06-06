@@ -3,7 +3,7 @@
 ## https://gitlab.com/gitlab-org/omnibus-gitlab/blob/629def0a7a26e7c2326566f0758d4a27857b52a3/README.md#configuring-the-external-url-for-gitlab
 
 external_url 'http://packer-debian-7.8-amd64'
-gitlab_rails['backup_path'] = "{{ backup_dir_gitlab }}"
+gitlab_rails['backup_path'] = "{{ gitlab_backup_dir }}"
 
 ## Note: configuration settings below are optional.
 ## Uncomment and change the value.

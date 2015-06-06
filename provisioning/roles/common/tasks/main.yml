@@ -5,15 +5,18 @@
   with_first_found:
    - aptcacher.yml
    - empty_fallback.yml
+  tags: install
 
 - name: use apt-cache
   template: src=01_proxy.j2 dest=/etc/apt/apt.conf.d/01_proxy owner=root group=root mode=644
   sudo: true
   when: aptcacher_host is defined
+  tags: install
 
 # setup backup folder
 - name: create backup folder
-  shell: "mkdir -p {{ backup_dir_common }}"
+  file: "path={{ backup_dir_common }} state=directory mode=0777"
+  tags: install
 
 # install base applications
 - name: install base applications
@@ -24,11 +27,24 @@
     - curl
     - openssh-server
     - ca-certificates
-  tags:
-    - packages
+  tags: install
 
 # start necessary services
 - name: start the ntp service
   service: name=ntp state=started enabled=true
-  tags: ntp
+  tags: install
 
+################################################################################
+# backup
+################################################################################
+- name: create scripts_dir
+  file: "path={{ scripts_dir }} state=directory mode=0777"
+  tags: backup
+
+- name: copy backup script
+  template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_common.sh owner=root group=root mode=0755"
+  tags: backup
+
+- name: perform backup
+  shell: "sh -c '{{ scripts_dir }}/backup_common.sh'"
+  tags: backup
