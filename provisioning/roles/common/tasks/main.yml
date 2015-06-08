@@ -16,7 +16,10 @@
 # setup backup folder
 - name: create backup folder
   file: "path={{ backup_dir_common }} state=directory mode=0777"
-  tags: install
+  tags:
+    - install
+    - backup
+    - restore
 
 # install base applications
 - name: install base applications
@@ -34,13 +37,23 @@
   service: name=ntp state=started enabled=true
   tags: install
 
+- name: create scripts_dir
+  file: "path={{ scripts_dir }} state=directory mode=0777"
+  tags:
+    - install
+    - backup
+    - restore
+
+- name: copy functions.sh
+  copy: "src=functions.sh dest={{ scripts_dir }}/functions.sh owner=root group=root mode=0755"
+  tags:
+    - install
+    - backup
+    - restore
+
 ################################################################################
 # backup
 ################################################################################
-- name: create scripts_dir
-  file: "path={{ scripts_dir }} state=directory mode=0777"
-  tags: backup
-
 - name: copy backup script
   template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_common.sh owner=root group=root mode=0755"
   tags: backup
@@ -48,3 +61,14 @@
 - name: perform backup
   shell: "sh -c '{{ scripts_dir }}/backup_common.sh'"
   tags: backup
+
+################################################################################
+# restore
+################################################################################
+- name: copy restore script
+  template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_common.sh owner=root group=root mode=0755"
+  tags: restore
+
+- name: perform restore
+  shell: "sh -c '{{ scripts_dir }}/restore_common.sh'"
+  tags: restore

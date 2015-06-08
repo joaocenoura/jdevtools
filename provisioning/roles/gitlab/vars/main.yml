@@ -1,2 +1,3 @@
 ---
 gitlab_backup_dir: /var/opt/gitlab/backups
+backup_filename_gitlab: etc-gitlab.tar

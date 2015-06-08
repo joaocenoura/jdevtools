@@ -30,7 +30,10 @@
 # setup backup folder
 - name: create backup folder
   file: "path={{ backup_dir_gitlab }} state=directory mode=0777"
-  tags: install
+  tags:
+    - install
+    - backup
+    - restore
 
 # configure gitlab
 - name: gitlab reconfigure
@@ -48,3 +51,15 @@
 - name: perform backup
   shell: "sh -c '{{ scripts_dir }}/backup_gitlab.sh'"
   tags: backup
+
+################################################################################
+# restore
+################################################################################
+- name: copy restore script
+  template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_gitlab.sh owner=root group=root mode=0755"
+  tags: restore
+
+- name: perform restore
+  shell: "sh -c '{{ scripts_dir }}/restore_gitlab.sh'"
+  notify: gitlab reconfigure
+  tags: restore

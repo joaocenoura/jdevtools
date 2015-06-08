@@ -1,10 +1,19 @@
 #!/bin/bash
-FPREFIX={{ backup_file_prefix }}
+set -e
+source {{ scripts_dir }}/functions.sh
 
+FPREFIX=$(get_backup_prefix)
+
+###############################################################################
 # gitlab application backup (db, repositories etc)
 sudo gitlab-rake gitlab:backup:create
 gitlab_backup_file=$(ls {{ gitlab_backup_dir }} | sort -r | head -1)
-sudo cp {{ gitlab_backup_dir }}/${gitlab_backup_file} {{ backup_dir_gitlab }}/${FPREFIX}_gitlab_backup.tar
+sudo cp {{ gitlab_backup_dir }}/${gitlab_backup_file} {{ backup_dir_gitlab }}/${FPREFIX}_${gitlab_backup_file}
 
+###############################################################################
 # backup /etc/gitlab
-tar -cf {{ backup_dir_gitlab }}/${FPREFIX}_etc-gitlab.tar -C / /etc/gitlab
+backup_tar \
+	{{ backup_dir_gitlab }} \
+	${FPREFIX} \
+	{{ backup_filename_gitlab }} \
+	/etc/gitlab

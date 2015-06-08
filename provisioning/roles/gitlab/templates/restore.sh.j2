@@ -1,0 +1,42 @@
+#!/bin/bash
+set -e
+source {{ scripts_dir }}/functions.sh
+
+###############################################################################
+# restore gitlab configurations
+restore_tar {{ backup_dir_gitlab }} {{ backup_filename_gitlab }}
+
+###############################################################################
+# gitlab restore process - copy the latest backup to gitlabs backup folder
+GL_BACKUP_FILE=$(ls {{ backup_dir_gitlab }} | grep '_gitlab_backup.tar' | sort -r | head -1)
+if [ -z "$GL_BACKUP_FILE" ]; then
+	echo "skipping restore of gitlab (backup file not found)"
+	exit 0
+fi
+
+# remove prefix added in the backup process (e.g.: 20150607-172531_)
+BACKUP_FNAME=`echo ${GL_BACKUP_FILE} | cut -c 17-`
+# extract backup timestamp from filename
+TIMESTAMP=`echo $BACKUP_FNAME | cut -d'_' -f 1`
+# copy backup to gitlabs backup directory
+sudo cp {{ backup_dir_gitlab }}/${GL_BACKUP_FILE} {{ gitlab_backup_dir }}/${BACKUP_FNAME}
+sudo chown git:git {{ gitlab_backup_dir }}/${BACKUP_FNAME}
+
+# gitlab restore process - as described in https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/raketasks/backup_restore.md#omnibus-installations
+# Stop processes that are connected to the database
+sudo gitlab-ctl stop unicorn
+sudo gitlab-ctl stop sidekiq
+
+# This command will overwrite the contents of your GitLab database!
+sudo gitlab-rake gitlab:backup:restore BACKUP=${TIMESTAMP} force=yes
+
+# Start GitLab
+sudo gitlab-ctl start
+
+# Create satellites
+sudo gitlab-rake gitlab:satellites:create
+
+# Check GitLab
+sudo gitlab-rake gitlab:check SANITIZE=true
+
+echo "restore complete!"

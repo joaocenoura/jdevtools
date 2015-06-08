@@ -1,7 +1,5 @@
 ---
 #
-backup_file_prefix: "`date +%Y%m%d-%H%M%S`"
-
 # backup directories
 backup_dir_common: /vagrant/backup/common
 backup_dir_gitlab: /vagrant/backup/gitlab
