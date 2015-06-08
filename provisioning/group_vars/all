@@ -3,6 +3,7 @@
 # backup directories
 backup_dir_common: /vagrant/backup/common
 backup_dir_gitlab: /vagrant/backup/gitlab
+backup_dir_jenkins: /vagrant/backup/jenkins
 
 # sh scripts directory
 scripts_dir: /vagrant/tmp

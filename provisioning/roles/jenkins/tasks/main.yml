@@ -1,0 +1,32 @@
+---
+# add specified repository into sources list
+- name: add apt-repository for jenkins (deb)
+  apt_repository: repo='deb http://pkg.jenkins-ci.org/debian binary/' state=present
+  tags: install
+
+- name: add apt-key for jenkins
+  apt_key: url=http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key state=present
+  tags: install
+
+# install jenkins
+- name: install jenkins
+  apt: "pkg={{ item }} state=installed update_cache=yes"
+  with_items:
+    - python-apt
+    - python-pycurl
+    - jenkins
+  tags: install
+
+# setup backup folder
+- name: create backup folder
+  file: "path={{ backup_dir_jenkins }} state=directory mode=0777"
+  tags:
+    - install
+    - backup
+    - restore
+
+# configure jenkins
+- name: configure jenkins
+  template: src=jenkins.j2 dest=/etc/default/jenkins owner=root group=root mode=755
+  notify: restart jenkins
+  tags: install
