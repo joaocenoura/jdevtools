@@ -30,3 +30,85 @@
   template: src=jenkins.j2 dest=/etc/default/jenkins owner=root group=root mode=755
   notify: restart jenkins
   tags: install
+
+# add necessary plugins
+# https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin
+- name: add jenkins plugin - git
+  get_url: url=http://updates.jenkins-ci.org/latest/git.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/SCM+API+Plugin
+- name: add jenkins plugin - scm-api (git dependency)
+  get_url: url=http://updates.jenkins-ci.org/latest/scm-api.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/Git+Client+Plugin
+- name: add jenkins plugin - git-client
+  get_url: url=http://updates.jenkins-ci.org/latest/git-client.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/Gitlab+Hook+Plugin
+- name: add jenkins plugin - gitlab-hook
+  get_url: url=http://updates.jenkins-ci.org/latest/gitlab-hook.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/Ruby+Runtime+Plugin
+- name: add jenkins plugin - ruby-runtime (gitlab-hook dependency)
+  get_url: url=http://updates.jenkins-ci.org/latest/ruby-runtime.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/Gitlab+Logo+Plugin
+- name: add jenkins plugin - gitlab-logo
+  get_url: url=http://updates.jenkins-ci.org/latest/gitlab-logo.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin
+- name: add jenkins plugin - gitlab-plugin
+  get_url: url=http://updates.jenkins-ci.org/latest/gitlab-plugin.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# https://wiki.jenkins-ci.org/display/JENKINS/Gitlab+Merge+Request+Builder+Plugin
+- name: add jenkins plugin - gitlab-merge-request-jenkins
+  get_url: url=http://updates.jenkins-ci.org/latest/gitlab-merge-request-jenkins.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+# http://docs.sonarqube.org/display/PLUG/Jenkins+Plugin
+- name: add jenkins plugin - sonar
+  get_url: url=http://updates.jenkins-ci.org/latest/sonar.hpi dest=/var/lib/jenkins/plugins owner=jenkins group=jenkins mode=644
+  notify: restart jenkins
+  tags: install
+
+################################################################################
+# backup
+################################################################################
+- name: copy backup script
+  template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_jenkins.sh owner=root group=root mode=0755"
+  tags: backup
+
+- name: perform backup
+  shell: "sh -c '{{ scripts_dir }}/backup_jenkins.sh'"
+  tags: backup
+
+################################################################################
+# restore
+################################################################################
+- name: copy restore script
+  template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_jenkins.sh owner=root group=root mode=0755"
+  tags: restore
+
+- name: perform restore
+  service: name=jenkins state=stopped
+  tags: restore
+
+- name: perform restore
+  shell: "sh -c '{{ scripts_dir }}/restore_jenkins.sh'"
+  notify: start jenkins
+  tags: restore

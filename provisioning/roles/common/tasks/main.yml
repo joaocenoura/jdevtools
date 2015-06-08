@@ -28,10 +28,14 @@
     - apt-transport-https
     - ca-certificates
     - curl
+    - git
     - ntp
     - openjdk-7-jdk
     - openjdk-7-jre
     - openssh-server
+    # optional utilities
+    - tree
+    - vim
   tags: install
 
 - name: correct java version selected
