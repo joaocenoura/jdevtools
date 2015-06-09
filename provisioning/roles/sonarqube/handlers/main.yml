@@ -1,3 +1,6 @@
 ---
+- name: start sonarqube
+  service: name=sonar state=started
+  
 - name: restart sonarqube
   service: name=sonar state=restarted
