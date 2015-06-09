@@ -18,14 +18,6 @@
   when: aptcacher_host is defined
   tags: install
 
-# setup backup folder
-- name: create backup folder
-  file: "path={{ backup_dir_common }} state=directory mode=0777"
-  tags:
-    - install
-    - backup
-    - restore
-
 # install base applications
 - name: install base applications
   apt: "pkg={{item}} state=installed update_cache=yes"
@@ -68,7 +60,7 @@
     - restore
 
 - name: copy get_newest_file.sh
-  copy: "src=get_newest_file.sh dest={{ scripts_dir }}/get_newest_file.sh mode=0755"
+  template: "src=get_newest_file.sh.j2 dest={{ scripts_dir }}/get_newest_file.sh mode=0755"
   tags:
     - install
     - backup
@@ -77,21 +69,29 @@
 ################################################################################
 # backup
 ################################################################################
-- name: copy backup script
-  template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_common.sh owner=root group=root mode=0755"
+
+# setup backup folder & stop service
+- name: create backup folder
+  file: "path={{ backup_dir_common }} state=directory mode=0777"
   tags: backup
 
-- name: perform backup
-  shell: "sh -c '{{ scripts_dir }}/backup_common.sh'"
+# backup jenkins
+- name: "backup jenkins"
+  command: "tar -cf {{ backup_dir_common }}/{{ timestamp.stdout }}_{{ ssh_backup_filename }} -C / /etc/ssh"
   tags: backup
 
 ################################################################################
 # restore
 ################################################################################
-- name: copy restore script
-  template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_common.sh owner=root group=root mode=0755"
+
+# restore jenkins
+- name: "restore commons - find latest backup"
+  command: "{{ scripts_dir }}/get_newest_file.sh {{ backup_dir_common }} {{ ssh_backup_filename }}"
+  register: backup_file
+  ignore_errors: True
   tags: restore
 
-- name: perform restore
-  shell: "sh -c '{{ scripts_dir }}/restore_common.sh'"
+- name: "restore {{ jenkins_home_dir }} - untar backup"
+  unarchive: src={{ backup_dir_common }}/{{ backup_file.stdout }} dest=/ copy=no
+  when: backup_file|success
   tags: restore

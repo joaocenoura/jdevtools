@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-source {{ scripts_dir }}/functions.sh
-
-FPREFIX=$(get_backup_prefix)
-
-###############################################################################
-# backup /etc/ssh
-backup_tar {{ backup_dir_common }} ${FPREFIX} {{ backup_filename_ssh }} /etc/ssh

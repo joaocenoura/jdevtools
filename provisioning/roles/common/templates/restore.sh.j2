@@ -1,7 +1,0 @@
-#!/bin/bash
-set -e
-source {{ scripts_dir }}/functions.sh
-
-###############################################################################
-# restore /etc/ssh
-restore_tar {{ backup_dir_common }} {{ backup_filename_ssh }}

@@ -1,2 +1,2 @@
 ---
-backup_filename_ssh: "etc-ssh.tar"
+ssh_backup_filename: "etc-ssh.tar"
