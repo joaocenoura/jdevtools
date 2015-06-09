@@ -7,6 +7,7 @@ Vagrant.configure(2) do |config|
   # port forwarding gitlab
   config.vm.network "forwarded_port", guest: 80, host: 9870
   config.vm.network "forwarded_port", guest: 8081, host: 9871
+  config.vm.network "forwarded_port", guest: 9000, host: 9872
   config.vm.network "private_network", ip: "192.168.33.100"
 
   config.vm.provider "virtualbox" do |vb|

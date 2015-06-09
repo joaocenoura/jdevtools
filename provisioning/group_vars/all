@@ -4,6 +4,7 @@
 backup_dir_common: /vagrant/backup/common
 backup_dir_gitlab: /vagrant/backup/gitlab
 backup_dir_jenkins: /vagrant/backup/jenkins
+backup_dir_sonarqube: /vagrant/backup/sonarqube
 
 # sh scripts directory
 scripts_dir: /vagrant/tmp

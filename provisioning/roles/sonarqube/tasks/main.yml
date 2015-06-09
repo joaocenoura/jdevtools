@@ -1,0 +1,68 @@
+---
+# add specified repository into sources list
+- name: add apt-repository for sonarqube (deb)
+  apt_repository: repo='deb http://downloads.sourceforge.net/project/sonar-pkg/deb binary/' state=present
+  tags: install
+
+# install sonarqube (force=yes; package unsigned)
+- name: install sonarqube
+  apt: "pkg=sonar force=yes state=installed update_cache=yes"
+  tags: install
+
+- name: install sonarqube dependencies
+  apt: "pkg={{ item }} state=installed"
+  with_items:
+    - mysql-server
+    - python-mysqldb
+  tags: install
+
+# setup backup folder
+- name: create backup folder
+  file: "path={{ backup_dir_sonarqube }} state=directory mode=0777"
+  tags:
+    - install
+    - backup
+    - restore
+
+# configure sonarqube
+- name: configure sonarqube
+  template: src=sonar.properties.j2 dest=/opt/sonar/conf/sonar.properties owner=root group=root mode=755
+  notify: restart sonarqube
+  tags: install
+
+- name: configure sonarqube mysql - default db
+  mysql_db: name=sonar encoding=utf8 state=present
+  notify: restart sonarqube
+  tags: install
+
+- name: configure sonarqube mysql - default user
+  mysql_user: name=sonar host=localhost password=sonar priv=sonar.*:ALL,GRANT state=present
+  notify: restart sonarqube
+  tags: install
+
+# ################################################################################
+# # backup
+# ################################################################################
+# - name: copy backup script
+#   template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_sonarqube.sh owner=root group=root mode=0755"
+#   tags: backup
+# 
+# - name: perform backup
+#   shell: "sh -c '{{ scripts_dir }}/backup_sonarqube.sh'"
+#   tags: backup
+# 
+# ################################################################################
+# # restore
+# ################################################################################
+# - name: copy restore script
+#   template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_sonarqube.sh owner=root group=root mode=0755"
+#   tags: restore
+# 
+# - name: stop sonarqube
+#   service: name=sonarqube state=stopped
+#   tags: restore
+# 
+# - name: perform restore
+#   shell: "sh -c '{{ scripts_dir }}/restore_sonarqube.sh'"
+#   notify: start sonarqube
+#   tags: restore

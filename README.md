@@ -13,6 +13,13 @@ after the installation process complete, go to:
 
 And you're done!
 
+# guidelines
+this is just a simple guideline/workflow to use all the provided tools.
+for each project:
+- create a new project in [gitlab](http://localhost:9870)
+- integrate gitlab with [jenkins](http://localhost:9871) by following this [guide](http://doc.gitlab.com/ee/integration/jenkins.html)
+- 
+
 # references
 - https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/raketasks/backup_restore.md
 - https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#backup-and-restore-omnibus-gitlab-configuration

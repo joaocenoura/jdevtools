@@ -12,8 +12,6 @@
 - name: install jenkins
   apt: "pkg={{ item }} state=installed update_cache=yes"
   with_items:
-    - python-apt
-    - python-pycurl
     - jenkins
   tags: install
 
@@ -104,7 +102,7 @@
   template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_jenkins.sh owner=root group=root mode=0755"
   tags: restore
 
-- name: perform restore
+- name: stop jenkins
   service: name=jenkins state=stopped
   tags: restore
 

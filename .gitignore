@@ -1,6 +1,7 @@
 # volatile folders intended for local usage
 /.vagrant
 /backup
+/provisioning/callback_plugins
 /tmp
 
 # apt-cache-ng configurations (user may specify one if needed)
