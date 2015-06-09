@@ -16,7 +16,6 @@
     - python-mysqldb
   tags: install
 
-
 # configure sonarqube
 - name: configure sonarqube
   template: src=sonar.properties.j2 dest=/opt/sonar/conf/sonar.properties owner={{ sonar_user }} group={{ sonar_group }} mode=644
@@ -56,14 +55,14 @@
   tags: backup
 
 # backup configurations
-- name: "backup {{ sonar_dir }}/conf"
-  command: "tar -cf {{ backup_dir_sonarqube }}/{{ timestamp.stdout }}_{{ sonar_backup_conf_filename }} -C / {{ sonar_dir }}/conf"
+- name: "backup {{ sonar_home_dir }}/conf"
+  command: "tar -cf {{ backup_dir_sonarqube }}/{{ timestamp.stdout }}_{{ sonar_backup_conf_filename }} -C / {{ sonar_home_dir }}/conf"
   notify: start sonarqube
   tags: backup
 
 # backup plugins
-- name: "backup {{ sonar_dir }}/extensions/plugins"
-  command: "tar -cf {{ backup_dir_sonarqube }}/{{ timestamp.stdout }}_{{ sonar_backup_plugins_filename }} -C / {{ sonar_dir }}/extensions/plugins"
+- name: "backup {{ sonar_home_dir }}/extensions/plugins"
+  command: "tar -cf {{ backup_dir_sonarqube }}/{{ timestamp.stdout }}_{{ sonar_backup_plugins_filename }} -C / {{ sonar_home_dir }}/extensions/plugins"
   notify: start sonarqube
   tags: backup
 
@@ -79,7 +78,7 @@
 # restore database
 - name: "restore sonar db - find latest backup"
   command: "{{ scripts_dir }}/get_newest_file.sh {{ backup_dir_sonarqube }} {{ sonar_backup_db_filename }}"
-  register: sonar_backup_file
+  register: backup_file
   ignore_errors: True
   tags: restore
 
@@ -87,31 +86,34 @@
   mysql_db:
     state=import
     name={{ sonar_db_name }}
-    target={{ backup_dir_sonarqube }}/{{ sonar_backup_file.stdout }}
-  when: sonar_backup_file|success
+    target={{ backup_dir_sonarqube }}/{{ backup_file.stdout }}
+  when: backup_file|success
   notify: start sonarqube
   tags: restore
 
 # restore configurations
-- name: "restore {{ sonar_dir }}/conf - find latest backup"
+- name: "restore {{ sonar_home_dir }}/conf - find latest backup"
   command: "{{ scripts_dir }}/get_newest_file.sh {{ backup_dir_sonarqube }} {{ sonar_backup_conf_filename }}"
-  register: sonar_backup_file
+  register: backup_file
   ignore_errors: True
+  notify: start sonarqube
   tags: restore
 
-- name: "restore {{ sonar_dir }}/conf - untar backup"
-  unarchive: src={{ backup_dir_sonarqube }}/{{ sonar_backup_file.stdout }} dest=/ copy=no
+- name: "restore {{ sonar_home_dir }}/conf - untar backup"
+  unarchive: src={{ backup_dir_sonarqube }}/{{ backup_file.stdout }} dest=/ copy=no
+  notify: start sonarqube
+  when: backup_file|success
   tags: restore
-  when: sonar_backup_file|success
 
-# restore configurations
-- name: "restore {{ sonar_dir }}/extensions/plugins - find latest backup"
+# restore plugins
+- name: "restore {{ sonar_home_dir }}/extensions/plugins - find latest backup"
   command: "{{ scripts_dir }}/get_newest_file.sh {{ backup_dir_sonarqube }} {{ sonar_backup_plugins_filename }}"
-  register: sonar_backup_file
+  register: backup_file
   ignore_errors: True
   tags: restore
 
-- name: "restore {{ sonar_dir }}/extensions/plugins - untar backup"
-  unarchive: src={{ backup_dir_sonarqube }}/{{ sonar_backup_file.stdout }} dest=/ copy=no
+- name: "restore {{ sonar_home_dir }}/extensions/plugins - untar backup"
+  unarchive: src={{ backup_dir_sonarqube }}/{{ backup_file.stdout }} dest=/ copy=no
+  notify: start sonarqube
+  when: backup_file|success
   tags: restore
-  when: sonar_backup_file|success

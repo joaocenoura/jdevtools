@@ -6,7 +6,7 @@
   sonar_db_user: sonar
   sonar_db_pass: sonar
 
-  sonar_dir: /opt/sonar
+  sonar_home_dir: /opt/sonar
 
   sonar_backup_db_filename: dump.sql.gz
   sonar_backup_conf_filename: opt-sonar-conf.tar
