@@ -1,3 +1,3 @@
 ---
 jenkins_home_dir: /var/lib/jenkins
-backup_filename_jenkins: "var-lib-jenkins.tar"
+jenkins_backup_filename: "var-lib-jenkins.tar"

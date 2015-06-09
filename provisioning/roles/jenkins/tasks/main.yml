@@ -15,14 +15,6 @@
     - jenkins
   tags: install
 
-# setup backup folder
-- name: create backup folder
-  file: "path={{ backup_dir_jenkins }} state=directory mode=0777"
-  tags:
-    - install
-    - backup
-    - restore
-
 # configure jenkins
 - name: configure jenkins
   template: src=jenkins.j2 dest=/etc/default/jenkins owner=root group=root mode=755
@@ -87,26 +79,40 @@
 ################################################################################
 # backup
 ################################################################################
-- name: copy backup script
-  template: "src=backup.sh.j2 dest={{ scripts_dir }}/backup_jenkins.sh owner=root group=root mode=0755"
+
+# setup backup folder & stop service
+- name: create backup folder
+  file: "path={{ backup_dir_jenkins }} state=directory mode=0777"
   tags: backup
 
-- name: perform backup
-  shell: "sh -c '{{ scripts_dir }}/backup_jenkins.sh'"
+- name: stop jenkins
+  service: name=jenkins state=stopped
+  tags: backup
+
+# backup jenkins
+- name: "backup jenkins"
+  command: "tar -cf {{ backup_dir_jenkins }}/{{ timestamp.stdout }}_{{ jenkins_backup_filename }} -C / {{ jenkins_home_dir }}"
+  notify: start jenkins
   tags: backup
 
 ################################################################################
 # restore
 ################################################################################
-- name: copy restore script
-  template: "src=restore.sh.j2 dest={{ scripts_dir }}/restore_jenkins.sh owner=root group=root mode=0755"
-  tags: restore
 
+# stop service
 - name: stop jenkins
   service: name=jenkins state=stopped
+  tags: backup
+
+# restore jenkins
+- name: "restore jenkins - find latest backup"
+  command: "{{ scripts_dir }}/get_newest_file.sh {{ backup_dir_jenkins }} {{ jenkins_backup_filename }}"
+  register: backup_file
+  ignore_errors: True
   tags: restore
 
-- name: perform restore
-  shell: "sh -c '{{ scripts_dir }}/restore_jenkins.sh'"
+- name: "restore {{ jenkins_home_dir }} - untar backup"
+  unarchive: src={{ backup_dir_jenkins }}/{{ backup_file.stdout }} dest=/ copy=no
   notify: start jenkins
+  when: backup_file|success
   tags: restore
