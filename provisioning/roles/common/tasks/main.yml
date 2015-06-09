@@ -91,7 +91,7 @@
   ignore_errors: True
   tags: restore
 
-- name: "restore {{ jenkins_home_dir }} - untar backup"
+- name: "restore /etc/ssh - untar backup"
   unarchive: src={{ backup_dir_common }}/{{ backup_file.stdout }} dest=/ copy=no
   when: backup_file|success
   tags: restore
