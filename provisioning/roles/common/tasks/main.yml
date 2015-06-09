@@ -56,7 +56,7 @@
     - restore
 
 - name: copy functions.sh
-  copy: "src=functions.sh dest={{ scripts_dir }}/functions.sh owner=root group=root mode=0755"
+  copy: "src=functions.sh dest={{ scripts_dir }}/functions.sh mode=0755"
   tags:
     - install
     - backup
