@@ -2,6 +2,9 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
+  if Vagrant.has_plugin?("vagrant-timezone")
+    config.timezone.value = "Europe/Lisbon"
+  end
   config.vm.box = "chef/debian-7.8"
 
   # port forwarding gitlab
