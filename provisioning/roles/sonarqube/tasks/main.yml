@@ -66,6 +66,11 @@
   notify: start sonarqube
   tags: backup
 
+# remove duplicated backups
+- name: remove duplicated backups
+  command: "fdupes -dN {{ backup_dir_sonarqube }}"
+  tags: backup
+
 ################################################################################
 # restore
 ################################################################################

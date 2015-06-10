@@ -52,6 +52,11 @@
   shell: "sh -c '{{ scripts_dir }}/backup_gitlab.sh'"
   tags: backup
 
+# remove duplicated backups
+- name: remove duplicated backups
+  command: "fdupes -dN {{ backup_dir_gitlab }}"
+  tags: backup
+
 ################################################################################
 # restore
 ################################################################################

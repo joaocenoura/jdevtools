@@ -6,8 +6,8 @@
   sudo: True
   roles:
     - common
-#    - gitlab
+    - gitlab
 #    # see discussion: https://github.com/ansible/ansible/issues/5952
 #    #- { role: gitlab, tags: [ "install" ] }
-#    - jenkins
+    - jenkins
     - sonarqube

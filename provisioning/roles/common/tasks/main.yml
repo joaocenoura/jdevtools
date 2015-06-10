@@ -25,6 +25,7 @@
     - apt-transport-https
     - ca-certificates
     - curl
+    - fdupes
     - git
     - ntp
     - openjdk-7-jdk
@@ -75,9 +76,14 @@
   file: "path={{ backup_dir_common }} state=directory mode=0777"
   tags: backup
 
-# backup jenkins
-- name: "backup jenkins"
+# backup commons
+- name: "backup commons"
   command: "tar -cf {{ backup_dir_common }}/{{ timestamp.stdout }}_{{ ssh_backup_filename }} -C / /etc/ssh"
+  tags: backup
+
+# remove duplicated backups
+- name: remove duplicated backups
+  command: "fdupes -dN {{ backup_dir_common }}"
   tags: backup
 
 ################################################################################

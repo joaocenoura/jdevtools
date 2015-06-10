@@ -95,6 +95,11 @@
   notify: start jenkins
   tags: backup
 
+# remove duplicated backups
+- name: remove duplicated backups
+  command: "fdupes -dN {{ backup_dir_jenkins }}"
+  tags: backup
+
 ################################################################################
 # restore
 ################################################################################

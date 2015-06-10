@@ -2,12 +2,12 @@
 set -e
 source {{ scripts_dir }}/functions.sh
 
-FPREFIX=$(get_backup_prefix)
+FPREFIX="{{ timestamp.stdout }}"
 
 ###############################################################################
 # gitlab application backup (db, repositories etc)
 sudo gitlab-rake gitlab:backup:create
-gitlab_backup_file=$(ls {{ gitlab_backup_dir }} | sort -r | head -1)
+gitlab_backup_file=`get_newest_file {{ gitlab_backup_dir }} gitlab_backup.tar`
 sudo cp {{ gitlab_backup_dir }}/${gitlab_backup_file} {{ backup_dir_gitlab }}/${FPREFIX}_${gitlab_backup_file}
 
 ###############################################################################
