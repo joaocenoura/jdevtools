@@ -28,6 +28,17 @@ optionally, you may install:
 - [apt-cacher-ng][6] - caches deb packages; useful if developing this project
 - [vagrant-timezone][7] - allows to setup a timezone on the vagrant machine
 
+# Backup & Restore
+both processes are executed at the host machine:
+```
+./jdevtools-backup.sh
+./jdevtools-restore.sh
+```
+note:
+- backups are stored in `backups/` (this folder is automatically created when performing a backup).
+- [fdupes][8] will remove any duplicated backup in order to save space
+- the restore process will always fetch the latest backup.
+
 # Configuration
 
 ## port forwarding
@@ -48,7 +59,22 @@ edit `Vagrantfile` and change the 'config.timezone.value' variable:
 ```
 
 ## apt-cacher-ng
-TODO
+apt-cacher-ng is very useful when one is constantly provisioning the box. It allows to cache deb files (all except gitlab) and reduces drastically the provisioning time.  
+to setup the box to use a apt-cacher-ng proxy, simply create the file `provisioning/roles/common/vars/aptcacher.yml` and add:
+```
+---
+aptcacher_host: <apt_cacher_ng_ipaddress>:3142
+```
+
+to setup a apt-cacher server, check https://github.com/joaocenoura/apt-cacher-ng  
+or use the provided script to spin up a apt-cacher server:
+```
+# this will checkout https://github.com/joaocenoura/apt-cacher-ng.git
+# and create the provisioning/roles/common/vars/aptcacher.yml
+./setup_aptcacher.sh
+cd tmp/apt-cacher-ng
+vagrant up
+```
 
 # Guidelines
 this is just a simple guideline/workflow to use all the provided tools.
@@ -68,6 +94,7 @@ for each project:
 [5]: http://www.ansible.com/
 [6]: https://www.unix-ag.uni-kl.de/~bloch/acng/
 [7]: https://github.com/tmatilai/vagrant-timezone
+[8]: https://github.com/adrianlopezroche/fdupes
 
 [20]: http://doc.gitlab.com/ee/integration/jenkins.html
 
