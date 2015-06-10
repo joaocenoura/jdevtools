@@ -8,9 +8,9 @@ Vagrant.configure(2) do |config|
   config.vm.box = "chef/debian-7.8"
 
   # port forwarding gitlab
-  config.vm.network "forwarded_port", guest: 80, host: 9870
-  config.vm.network "forwarded_port", guest: 8081, host: 9871
-  config.vm.network "forwarded_port", guest: 9000, host: 9872
+  config.vm.network "forwarded_port", guest: 80, host: 9871
+  config.vm.network "forwarded_port", guest: 8081, host: 9872
+  config.vm.network "forwarded_port", guest: 9000, host: 9873
   config.vm.network "private_network", ip: "192.168.33.100"
 
   config.vm.provider "virtualbox" do |vb|
