@@ -4,15 +4,15 @@ A java development ecosystem built with vagrant and ansible that provides:
 - [Jenkins][2] - continuous integration
 - [Sonarqube][3] - code quality inspection tool
 
-For now, it is intended for personal usage, say a personal/school project.
+For now, it is intended for personal usage, say a personal/school project.  
 Includes backup/restore for all applications.
 
 # Quickstart
 ```
-git clone https://github.com/joaocenoura/jdevtools.git .
+git clone https://github.com/joaocenoura/jdevtools.git jdevtools && cd $_
 vagrant up
 ```
-after the installation process complete, go to:
+after the installation process is completed, go to:
 - [GitLab @ http://localhost:9871/][9871]
 - [Jenkins @ http://localhost:9872/][9872]
 - [Sonarqube @ http://localhost:9873/][9873]
